@@ -66,7 +66,6 @@ class History extends Component {
         }
         return (
             <UdaciFitnessCalendar
-                style={{ marginTop: Platform.OS === 'ios' ? 20 : 0 }}
                 items={entries}
                 renderItem={this.renderItem}
                 renderEmptyDate={this.renderEmptyDate}
