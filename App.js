@@ -5,13 +5,15 @@ import History from './components/History'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import reducer from './reducers'
-import { TabNavigator } from 'react-navigation'
+import { TabNavigator, StackNavigator } from 'react-navigation'
 import { purple, white } from './utils/colors'
 import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Constants } from 'expo'
+import EntryDetail from './components/EntryDetail'
+import Live from './components/Live'
 
 const UdaciStatusBar = ({ backgroundColor, ...props }) => (
-    <View style={{backgroundColor, height: Constants.statusBarHeight}}>
+    <View style={{ backgroundColor, height: Constants.statusBarHeight }}>
         <StatusBar translucent backgroundColor={backgroundColor} {...props} />
     </View>
 )
@@ -43,6 +45,19 @@ const Tabs = TabNavigator(
                     />
                 )
             }
+        },
+        Live: {
+            screen: Live,
+            navigationOptions: {
+                tabBarLabel: 'Live',
+                tabBarIcon: ({ tintColor }) => (
+                    <Ionicons
+                        name="ios-speedometer"
+                        size={30}
+                        color={tintColor}
+                    />
+                )
+            }
         }
     },
     {
@@ -66,14 +81,32 @@ const Tabs = TabNavigator(
     }
 )
 
+const MainNavigator = StackNavigator({
+    Home: {
+        screen: Tabs
+    },
+    EntryDetail: {
+        screen: EntryDetail,
+        navigationOptions: {
+            headerTintColor: white,
+            headerStyle: {
+                backgroundColor: purple
+            }
+        }
+    }
+})
+
 class App extends Component {
     store = createStore(reducer)
     render() {
         return (
             <Provider store={this.store}>
                 <View style={{ flex: 1 }}>
-                    <UdaciStatusBar backgroundColor={purple} barStyle='light-content' />
-                    <Tabs />
+                    <UdaciStatusBar
+                        backgroundColor={purple}
+                        barStyle="light-content"
+                    />
+                    <MainNavigator />
                 </View>
             </Provider>
         )

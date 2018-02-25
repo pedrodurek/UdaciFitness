@@ -1,5 +1,11 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native'
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    Platform,
+    StyleSheet
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { getMetricMetaInfo, timeToString } from '../utils/helpers'
 import { submitEntry, removeEntry } from '../utils/api'
@@ -11,10 +17,15 @@ import { connect } from 'react-redux'
 import { addEntry } from '../actions'
 import { getDailyReminderValue } from '../utils/helpers'
 import { white, purple } from '../utils/colors'
+import { NavigationActions } from 'react-navigation'
 
 const SubmitBtn = ({ onPress }) => (
-    <TouchableOpacity 
-        style={Platform.OS === 'ios'? styles.iosSubmitBtn : styles.androidSubmitBtn}
+    <TouchableOpacity
+        style={
+            Platform.OS === 'ios'
+                ? styles.iosSubmitBtn
+                : styles.androidSubmitBtn
+        }
         onPress={onPress}
     >
         <Text style={styles.submitBtnText}>Submit</Text>
@@ -58,18 +69,13 @@ class AddEntry extends Component {
 
     submit = () => {
         const key = timeToString()
-        console.log(this.props)
         const entry = this.state
         this.props.addEntry({
             [key]: entry
         })
-
         this.setState({ run: 0, bike: 0, swim: 0, sleep: 0, eat: 0 })
-        // Navigate to home
-
         submitEntry({ key, entry })
-
-        // Clear local notification
+        this.toHome()
     }
 
     reset = () => {
@@ -77,10 +83,16 @@ class AddEntry extends Component {
         this.props.addEntry({
             [key]: getDailyReminderValue()
         })
-
-        // Route to home
-
+        this.toHome()
         removeEntry(key)
+    }
+
+    toHome = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: 'AddEntry'
+            })
+        )
     }
 
     render() {
@@ -89,15 +101,18 @@ class AddEntry extends Component {
         if (this.props.alreadyLogged) {
             return (
                 <View style={styles.center}>
-                    <Ionicons 
-                        name={Platform.OS === 'ios'?'ios-happy-outline':'md-happy'}
-                        size={100} 
+                    <Ionicons
+                        name={
+                            Platform.OS === 'ios'
+                                ? 'ios-happy-outline'
+                                : 'md-happy'
+                        }
+                        size={100}
                     />
                     <Text>You already logged your information for today</Text>
-                    <TextButton 
-                        style={{padding: 10}}
-                        onPress={this.reset}
-                    >Reset</TextButton>
+                    <TextButton style={{ padding: 10 }} onPress={this.reset}>
+                        Reset
+                    </TextButton>
                 </View>
             )
         }
@@ -169,8 +184,7 @@ const styles = StyleSheet.create({
     submitBtnText: {
         color: white,
         fontSize: 22,
-        textAlign: 'center',
-
+        textAlign: 'center'
     },
     center: {
         flex: 1,
