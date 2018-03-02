@@ -1,122 +1,12 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
-import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { View, StyleSheet, AsyncStorage } from 'react-native'
+import {
+    FontAwesome,
+    MaterialIcons,
+    MaterialCommunityIcons
+} from '@expo/vector-icons'
 import { white, red, orange, blue, purple, pink } from './colors'
-
-// export function getMetricMetaInfo(metric) {
-//     const info = {
-//         run: {
-//             displayName: 'Run',
-//             max: 50,
-//             unit: 'miles',
-//             step: 1,
-//             type: 'steppers',
-//             getIcon() {
-//                 return (
-//                     <View
-//                         style={[styles.iconContainer, { backgroundColor: red }]}
-//                     >
-//                         <MaterialIcons
-//                             name="directions-run"
-//                             color={white}
-//                             size={35}
-//                         />
-//                     </View>
-//                 )
-//             }
-//         },
-//         bike: {
-//             displayName: 'Bike',
-//             max: 100,
-//             unit: 'miles',
-//             step: 1,
-//             type: 'steppers',
-//             getIcon() {
-//                 return (
-//                     <View
-//                         style={[
-//                             styles.iconContainer,
-//                             { backgroundColor: orange }
-//                         ]}
-//                     >
-//                         <MaterialCommunityIcons
-//                             name="bike"
-//                             color={white}
-//                             size={32}
-//                         />
-//                     </View>
-//                 )
-//             }
-//         },
-//         swim: {
-//             displayName: 'Swim',
-//             max: 9900,
-//             unit: 'meters',
-//             step: 100,
-//             type: 'steppers',
-//             getIcon() {
-//                 return (
-//                     <View
-//                         style={[
-//                             styles.iconContainer,
-//                             { backgroundColor: blue }
-//                         ]}
-//                     >
-//                         <MaterialCommunityIcons
-//                             name="swim"
-//                             color={white}
-//                             size={35}
-//                         />
-//                     </View>
-//                 )
-//             }
-//         },
-//         sleep: {
-//             displayName: 'Sleep',
-//             max: 24,
-//             unit: 'hours',
-//             step: 1,
-//             type: 'slider',
-//             getIcon() {
-//                 return (
-//                     <View
-//                         style={[
-//                             styles.iconContainer,
-//                             { backgroundColor: lightPurp }
-//                         ]}
-//                     >
-//                         <FontAwesome name="bed" color={white} size={30} />
-//                     </View>
-//                 )
-//             }
-//         },
-//         eat: {
-//             displayName: 'Eat',
-//             max: 10,
-//             unit: 'rating',
-//             step: 1,
-//             type: 'slider',
-//             getIcon() {
-//                 return (
-//                     <View
-//                         style={[
-//                             styles.iconContainer,
-//                             { backgroundColor: pink }
-//                         ]}
-//                     >
-//                         <MaterialCommunityIcons
-//                             name="food"
-//                             color={white}
-//                             size={35}
-//                         />
-//                     </View>
-//                 )
-//             }
-//         }
-//     }
-
-//     return typeof metric === 'undefined' ? info : info[metric]
-// }
+import { Notifications, Permissions } from 'expo'
 
 export function isBetween(num, x, y) {
     if (num >= x && num <= y) {
@@ -183,9 +73,9 @@ export const getMetricMetaInfo = (metric) => {
             step: 1,
             type: 'steppers',
             getIcon: () => (
-                <View style={[styles.iconContainer, {backgroundColor: red}]}>
+                <View style={[styles.iconContainer, { backgroundColor: red }]}>
                     <MaterialIcons
-                        name='directions-run'
+                        name="directions-run"
                         color={white}
                         size={35}
                     />
@@ -199,9 +89,11 @@ export const getMetricMetaInfo = (metric) => {
             step: 1,
             type: 'steppers',
             getIcon: () => (
-                <View style={[styles.iconContainer, {backgroundColor: orange}]}>
+                <View
+                    style={[styles.iconContainer, { backgroundColor: orange }]}
+                >
                     <MaterialCommunityIcons
-                        name='bike'
+                        name="bike"
                         color={white}
                         size={35}
                     />
@@ -215,9 +107,9 @@ export const getMetricMetaInfo = (metric) => {
             step: 100,
             type: 'steppers',
             getIcon: () => (
-                <View style={[styles.iconContainer, {backgroundColor: blue}]}>
+                <View style={[styles.iconContainer, { backgroundColor: blue }]}>
                     <MaterialCommunityIcons
-                        name='swim'
+                        name="swim"
                         color={white}
                         size={35}
                     />
@@ -231,12 +123,10 @@ export const getMetricMetaInfo = (metric) => {
             step: 1,
             type: 'slider',
             getIcon: () => (
-                <View style={[styles.iconContainer, {backgroundColor: purple}]}>
-                    <FontAwesome
-                        name='bed'
-                        color={white}
-                        size={35}
-                    />
+                <View
+                    style={[styles.iconContainer, { backgroundColor: purple }]}
+                >
+                    <FontAwesome name="bed" color={white} size={35} />
                 </View>
             )
         },
@@ -247,9 +137,9 @@ export const getMetricMetaInfo = (metric) => {
             step: 1,
             type: 'slider',
             getIcon: () => (
-                <View style={[styles.iconContainer, {backgroundColor: pink}]}>
+                <View style={[styles.iconContainer, { backgroundColor: pink }]}>
                     <MaterialCommunityIcons
-                        name='food'
+                        name="food"
                         color={white}
                         size={35}
                     />
@@ -257,9 +147,54 @@ export const getMetricMetaInfo = (metric) => {
             )
         }
     }
-    return typeof metric === 'undefined' ? info: info[metric]
+    return typeof metric === 'undefined' ? info : info[metric]
 }
 
 export const getDailyReminderValue = () => ({
     today: "Don't forget to log your data today"
 })
+
+export const clearLocalNotification = () =>
+    AsyncStorage.removeItem(NOTIFICATION_KEY).then(
+        Notifications.cancelAllScheduledNotificationsAsync
+    )
+
+export const createNotification = () => ({
+    title: 'Log your stats!',
+    body: "👋 don't forget to log your stats for today!",
+    ios: { sound: true },
+    android: { sound: true, priority: 'high', sticky: false, vibrate: true }
+})
+
+export const setLocalNotification = () =>
+    AsyncStorage.getItem(NOTIFICATION_KEY)
+        .then(JSON.parse)
+        .then((data) => {
+            if (data === null) {
+                Permissions.askAsync(Permissions.NOTIFICATIONS).then(
+                    ({ status }) => {
+                        if (status === 'granted') {
+                            Notifications.cancelAllScheduledNotificationsAsync()
+
+                            let tomorrow = new Date()
+                            tomorrow.setDate(tomorrow.getDate() + 1)
+                            tomorrow.setHours(20)
+                            tomorrow.setMintutes(0)
+
+                            Notifications.scheduleLocalNotificationsAsync(
+                                createNotification(),
+                                {
+                                    time: tomorrow,
+                                    repeat: 'day'
+                                }
+                            )
+
+                            AsyncStorage.setItem(
+                                NOTIFICATION_KEY,
+                                JSON.stringify(true)
+                            )
+                        }
+                    }
+                )
+            }
+        })
